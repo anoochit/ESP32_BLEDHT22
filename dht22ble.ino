@@ -26,8 +26,8 @@ float temperature;
 
 uint32_t delayMS;
 
-//#define SERVICE_UUID           "6E400001-B5A3-F393-E0A9-E50E24DCCA9E" // UART service UUID
-#define CHARACTERISTIC_UUID "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
+#define SERVICE_UUID  "95298e6a-6dbc-11ea-93d4-63607a02728e"
+#define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
 
 class MyServerCallbacks: public BLEServerCallbacks {
@@ -53,10 +53,12 @@ void setup() {
   pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
 
+  //BLEService *pService = pServer->createService(SERVICE_UUID);
   BLEService *pService = pServer->createService((uint16_t)0x181A);
 
   pCharacteristic = pService->createCharacteristic(
-                      CHARACTERISTIC_UUID,
+                      (uint16_t)0x181A,
+                      BLECharacteristic::PROPERTY_READ   |
                       BLECharacteristic::PROPERTY_NOTIFY
                     );
 
@@ -70,7 +72,7 @@ void setup() {
 
 void loop() {
 
-
+  // connected
   if (deviceConnected) {
     delay(delayMS);
 
@@ -104,7 +106,7 @@ void loop() {
     dtostrf(humidity, 1, 2, humidityString);
     dtostrf(temperature, 1, 2, temperatureString);
 
-    char dhtDataString[16];
+    char dhtDataString[12];
     sprintf(dhtDataString, "%.02f,%.02f", temperature, humidity);
 
     pCharacteristic->setValue(dhtDataString);
@@ -115,17 +117,17 @@ void loop() {
     Serial.println(" ***");
   }
 
-  // disconnecting
-  if (!deviceConnected && oldDeviceConnected) {
-    delay(500); // give the bluetooth stack the chance to get things ready
-    pServer->startAdvertising(); // restart advertising
-    Serial.println("start advertising");
-    oldDeviceConnected = deviceConnected;
-  }
-  // connecting
-  if (deviceConnected && !oldDeviceConnected) {
-    // do stuff here on connecting
-    oldDeviceConnected = deviceConnected;
-  }
+//  // disconnecting
+//  if (!deviceConnected && oldDeviceConnected) {
+//    delay(500); // give the bluetooth stack the chance to get things ready
+//    pServer->startAdvertising(); // restart advertising
+//    Serial.println("start advertising");
+//    oldDeviceConnected = deviceConnected;
+//  }
+//  // connecting
+//  if (deviceConnected && !oldDeviceConnected) {
+//    // do stuff here on connecting
+//    oldDeviceConnected = deviceConnected;
+//  }
 
 }
